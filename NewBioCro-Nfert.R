@@ -17,8 +17,9 @@ nitrocont2<-nitroParms()
 ##Very very sensitive to alpha.b1
 nitrocont<-nitroParms(Vmax.b1=-1,alpha.b1=-0.005, kLN = 0.5)
                                 # Fertilization (g/m2)=10Kg/ha, # initial mineral N
-centuryContfert<-centuryParms(Nfert = c(2800,110),iMinN = 0)
+centuryContfert<-centuryParms(iMinN = 0)
 
+Fertilizationcont<-list(c(100,200),c(500,500))
 
 #################################### Running
 modelNoN<- BioGro(weather05,timestep = 1,day1 = 90,dayn = 300,
@@ -31,7 +32,8 @@ modelN<- BioGro(weather05,timestep = 1,day1 = 90,dayn = 300,
                 soilControl=s0,
                 phenoControl=phenolcont,
                 centuryControl = centuryContfert, ## ading the fert
-                nitroControl = nitrocont)   # control the N effect on growth
+                nitroControl = nitrocont,
+                Fertilization =Fertilizationcont )   # control the N effect on growth
 
 ############ gathering data
 plotdata<-data.frame(Doy=modelN$DayofYear,Stem=modelN$Stem,
