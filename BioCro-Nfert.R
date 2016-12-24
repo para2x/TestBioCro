@@ -17,7 +17,7 @@ nitrocont2<-nitroParms()
 ##Very very sensitive to alpha.b1
 nitrocont<-nitroParms(Vmax.b1=-1,alpha.b1=-0.005, kLN = 0.5)
                                 # Fertilization (g/m2)=10Kg/ha, # initial mineral N
-centuryContfert<-centuryParms(Nfert = c(2800,110),iMinN = 0)
+centuryContfert<-centuryParms(Nfert = c(2800,110),iMinN = 5)
 
 
 #################################### Running

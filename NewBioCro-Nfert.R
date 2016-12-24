@@ -15,17 +15,17 @@ centuryContNofert<-centuryParms()
 nitrocont2<-nitroParms()
 ##### Crop N paraneters
 ##Very very sensitive to alpha.b1
-nitrocont<-nitroParms(Vmax.b1=-1,alpha.b1=-0.005, kLN = 0.5)
-                                # Fertilization (g/m2)=10Kg/ha, # initial mineral N
-centuryContfert<-centuryParms(iMinN = 0)
-
-Fertilizationcont<-list(c(100,200),c(500,500))
+nitrocont<-nitroParms(Vmax.b1=-0.3,alpha.b1=-0.02, kLN = 0.1,iLeafN = 1.3)
+                                # Fertilization (g/m2), # initial mineral N
+centuryContfert<-centuryParms(iMinN =0,SC1 = 0.5,SC2 =0.5 ,SC5=.1,SC6=.1,SC7=0.5)
+                                         #assuming g/m2
+Fertilizationcont<-list(c(150,250),c(10,10))
 
 #################################### Running
 modelNoN<- BioGro(weather05,timestep = 1,day1 = 90,dayn = 300,
                 soilControl=s0,
                 phenoControl=phenolcont,
-                centuryControl = centuryContNofert, ## ading the fert
+                centuryControl = centuryContfert, ## ading the fert
                 nitroControl = nitrocont)   # control the N effect on growth
 
 modelN<- BioGro(weather05,timestep = 1,day1 = 90,dayn = 300,
@@ -36,18 +36,19 @@ modelN<- BioGro(weather05,timestep = 1,day1 = 90,dayn = 300,
                 Fertilization =Fertilizationcont )   # control the N effect on growth
 
 ############ gathering data
-plotdata<-data.frame(Doy=modelN$DayofYear,Stem=modelN$Stem,
+plotdata<-data.frame(Doy=modelN$DayofYear,
+                     Biomass=modelN$Stem+modelN$Leaf+modelN$Grain,
                      LeafN=modelN$LeafNitrogen,
-                     SoilMinN=modelN$MinNitroVec+10,
+                     SoilMinN=modelN$MinNitroVec,
                      Model="Nfert",
                      Vmax=modelN$VmaxVec)
 plotdata<-rbind(plotdata,data.frame(Doy=modelN$DayofYear,
-                                    Stem=modelNoN$Stem,
+                                    Biomass=modelNoN$Stem+modelNoN$Leaf+modelNoN$Grain,
                                     LeafN=modelNoN$LeafNitrogen,
-                                    SoilMinN=modelNoN$MinNitroVec+10,
+                                    SoilMinN=modelNoN$MinNitroVec,
                                     Model="NoN",
                                     Vmax=modelNoN$VmaxVec))
-
+##gathering
 plotdata<-plotdata%>%gather(Param,Value,-c(Doy,Model))
 
 #plotting
@@ -61,4 +62,5 @@ plotdata%>%filter(Param!="SoilMinN")%>%ggplot()+
 plotdata%>%filter(Param=="SoilMinN")%>%ggplot()+
   geom_line(aes(Doy,Value,color=Model),size=1.6)+
   scale_x_continuous(breaks = seq(90,300,10))+
-  theme_bw()
+  theme_bw()+
+  geom_abline(intercept = 1e-3,slope = 0,size=1.2,color="red")
